@@ -5,24 +5,25 @@ pub mod day2 {
     #[warn(dead_code)]
     #[cfg(test)]
     pub fn solve(input: &str) {
+        use std::io;
+
 
         #[cfg(windows)]
         const LINE_ENDING: &'static str = "\r\n";
         #[cfg(not(windows))]
         const LINE_ENDING: &'static str = "\n";
 
-        const ROCK_POINTS: i32 = 1;
-        const PAPER_POINTS: i32 = 2;
-        const SCISSORS_POINTS: i32 = 3;
 
-        const LOOSE_POINTS: i32 = 0;
-        const DRAW_POINTS: i32 = 3;
-        const WIN_POINTS: i32 = 6;
+        pub enum Shapes {
+            ROCK = 1,
+            PAPER = 2,
+            SCISSORS = 3
+        }
 
-        pub enum Possibilities {
-            ROCK,
-            PAPER,
-            SCISSORS
+        pub enum EndOfRound {
+            LOOSE = 0,
+            DRAW = 3,
+            WIN = 6
         }
 
         let mut sum_of_points = 0;
@@ -30,38 +31,38 @@ pub mod day2 {
         for plays in input.split(format!("{}", LINE_ENDING).as_str()).into_iter() {
             let mut splitted_plays = plays.split_whitespace();
             let opponent_play = match splitted_plays.next().unwrap() {
-                "A" => Possibilities::ROCK,
-                "B" => Possibilities::PAPER,
-                "C" => Possibilities::SCISSORS,
+                "A" => Shapes::ROCK,
+                "B" => Shapes::PAPER,
+                "C" => Shapes::SCISSORS,
                 _ => panic!("Impossible")
             };
             let our_play = match splitted_plays.next().unwrap() {
-                "X" => Possibilities::ROCK,
-                "Y" => Possibilities::PAPER,
-                "Z" => Possibilities::SCISSORS,
+                "X" => EndOfRound::LOOSE,
+                "Y" => EndOfRound::DRAW,
+                "Z" => EndOfRound::WIN,
                 _ => panic!("Impossible")
             };
 
-            match opponent_play {
-                Possibilities::ROCK => sum_of_points += match our_play {
-                    Possibilities::ROCK  => ROCK_POINTS + DRAW_POINTS,
-                    Possibilities::PAPER  => PAPER_POINTS + WIN_POINTS,
-                    Possibilities::SCISSORS  => SCISSORS_POINTS + LOOSE_POINTS
+            sum_of_points += match opponent_play {
+                Shapes::ROCK => match our_play {
+                    EndOfRound::LOOSE => EndOfRound::LOOSE as i32 + Shapes::SCISSORS as i32,
+                    EndOfRound::DRAW  => EndOfRound::DRAW  as i32 + Shapes::ROCK     as i32,
+                    EndOfRound::WIN   => EndOfRound::WIN   as i32 + Shapes::PAPER    as i32
                 },
-                Possibilities::PAPER =>  sum_of_points += match our_play {
-                    Possibilities::ROCK  => ROCK_POINTS + LOOSE_POINTS,
-                    Possibilities::PAPER  => PAPER_POINTS + DRAW_POINTS,
-                    Possibilities::SCISSORS  => SCISSORS_POINTS + WIN_POINTS
+                Shapes::PAPER =>  match our_play {
+                    EndOfRound::LOOSE => EndOfRound::LOOSE as i32 + Shapes::ROCK     as i32,
+                    EndOfRound::DRAW  => EndOfRound::DRAW  as i32 + Shapes::PAPER    as i32,
+                    EndOfRound::WIN   => EndOfRound::WIN   as i32 + Shapes::SCISSORS as i32
                 },
-                Possibilities::SCISSORS =>  sum_of_points += match our_play {
-                    Possibilities::ROCK  => ROCK_POINTS + WIN_POINTS,
-                    Possibilities::PAPER  => PAPER_POINTS + LOOSE_POINTS,
-                    Possibilities::SCISSORS  => SCISSORS_POINTS + DRAW_POINTS
+                Shapes::SCISSORS =>  match our_play {
+                    EndOfRound::LOOSE => EndOfRound::LOOSE as i32 + Shapes::PAPER    as i32,
+                    EndOfRound::DRAW  => EndOfRound::DRAW  as i32 + Shapes::SCISSORS as i32,
+                    EndOfRound::WIN   => EndOfRound::WIN   as i32 + Shapes::ROCK     as i32
                 },
             };
 
         }
-        println!("Total points : {}", sum_of_points);
+        println!("Total points part 2: {}", sum_of_points);
     }
 
 }
