@@ -23,7 +23,6 @@ pub mod day1 {
                 let calories = calories_of_elf.parse::<i32>().unwrap();
                 total_elf_calories += calories;
             }
-            // println!("Elf {} carry {} calories", elf_index, total_elf_calories);
 
             top_three_elves_calories.push(total_elf_calories);
 
